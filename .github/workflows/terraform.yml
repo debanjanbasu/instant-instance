@@ -78,6 +78,9 @@ jobs:
         shell: bash
 
     steps:
+    - name: List s3 bucket
+      run: aws s3 ls
+      
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
