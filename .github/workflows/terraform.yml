@@ -52,7 +52,7 @@ on:
 
 jobs:
   terraform:
-    name: "Terraform"
+    name: "Terraform Sandpit2"
     runs-on: ubuntu-latest
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
@@ -75,6 +75,10 @@ jobs:
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+
+      # Switch workspace
+      - name: Terraform Init
+        run: terraform workspace select sandpit2
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
