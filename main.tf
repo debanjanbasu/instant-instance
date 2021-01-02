@@ -5,11 +5,11 @@
 module "terraform_state_backend" {
   source     = "git::https://github.com/cloudposse/terraform-aws-tfstate-backend.git?ref=master"
   namespace  = "instant-instance"
-  stage      = "test"
+  stage      = "build"
   name       = "terraform-state-bucket"
   attributes = ["state"]
 
   terraform_backend_config_file_path = "."
   terraform_backend_config_file_name = "backend.tf"
-  force_destroy                      = false
+  force_destroy                      = true
 }

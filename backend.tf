@@ -3,9 +3,9 @@ terraform {
 
   backend "s3" {
     region         = "ap-southeast-2"
-    bucket         = "instant-instance-test-terraform-state-bucket-state"
+    bucket         = "instant-instance-build-terraform-state-bucket-state"
     key            = "terraform.tfstate"
-    dynamodb_table = "instant-instance-test-terraform-state-bucket-state-lock"
+    dynamodb_table = "instant-instance-build-terraform-state-bucket-state-lock"
     profile        = ""
     role_arn       = ""
     encrypt        = "true"
