@@ -82,7 +82,9 @@ jobs:
 
       # Switch workspace
       - name: Terraform Init
-        run: terraform workspace select sandpit2
+        run: |
+          terraform workspace new sandpit2
+          terraform workspace select sandpit2
 
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
