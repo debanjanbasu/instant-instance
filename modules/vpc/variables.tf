@@ -9,3 +9,9 @@ variable "vpc_name" {
   description = "The name of the VPC"
   type        = string
 }
+
+variable "vpc_cidr_block" {
+  default     = "10.0.0.0/16"
+  description = "The CIDR block of the VPC"
+  type        = string
+}
