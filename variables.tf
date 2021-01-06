@@ -8,3 +8,11 @@ variable "profile" {
   type        = string
   default     = "default"
 }
+
+variable "additional_tags" {
+  default = {
+    Namespace = "instant-instance"
+  }
+  description = "Additional resource tags"
+  type        = map(string)
+}
