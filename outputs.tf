@@ -12,3 +12,8 @@ output "dynamodb_table_id" {
   value       = module.terraform_state_backend.dynamodb_table_id
   description = "DynamoDB table ID"
 }
+
+output "vpc_id" {
+  value       = module.instant_instance_vpc.vpc_id
+  description = "The VPC id"
+}
