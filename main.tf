@@ -19,5 +19,5 @@ module "terraform_state_backend" {
 module "instant_instance_vpc" {
   source             = "./modules/vpc"
   additional_tags    = var.additional_tags
-  vpc_name           = "instant_instance"
+  vpc_name           = "instant-instance"
 }
