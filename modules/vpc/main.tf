@@ -12,6 +12,7 @@ resource "aws_vpc" "instant_instance_vpc" {
 data "aws_availability_zones" "available" {
   state = "available"
 }
+
 resource "aws_subnet" "public" {
   count = length(data.aws_availability_zones.available.names)
 

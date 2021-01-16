@@ -17,7 +17,15 @@ module "terraform_state_backend" {
 }
 
 module "instant_instance_vpc" {
-  source             = "./modules/vpc"
-  additional_tags    = var.additional_tags
-  vpc_name           = "instant-instance"
+  source          = "./modules/vpc"
+  additional_tags = var.additional_tags
+  vpc_name        = "instant-instance"
+}
+
+module "instant_instance" {
+  source          = "./modules/cloud-gaming-instance"
+  additional_tags = var.additional_tags
+  vpc_id          = module.instant_instance_vpc.vpc_id
+  # This ami id would keep on changing
+  custom_ami = "ami-0cb245696a77930a5"
 }

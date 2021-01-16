@@ -17,3 +17,20 @@ output "vpc_id" {
   value       = module.instant_instance_vpc.vpc_id
   description = "The VPC id"
 }
+
+output "instance_id" {
+  value = module.instant_instance.instance_id
+}
+
+output "instance_ip" {
+  value = module.instant_instance.instance_ip
+}
+
+output "instance_public_dns" {
+  value = module.instant_instance.instance_public_dns
+}
+
+output "instance_password" {
+  value     = module.instant_instance.instance_password
+  sensitive = true
+}
