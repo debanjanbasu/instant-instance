@@ -11,7 +11,7 @@ variable "instance_name" {
 }
 
 variable "instance_type" {
-  default     = "g4dn.2xlarge"
+  default     = "g4dn.xlarge"
   description = "The instance type"
   type        = string
 }
@@ -23,7 +23,7 @@ variable "root_block_device_size_gb" {
 }
 
 variable "spot_max_price" {
-  default     = 1.5
+  default     = 1.0
   description = "The maximum price you are ready to pay for the instance"
   type        = number
 }

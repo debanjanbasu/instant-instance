@@ -29,6 +29,17 @@ resource "aws_ssm_parameter" "password" {
   })
 }
 
+resource "aws_ssm_parameter" "cloud_gaming_latest_ami_id" {
+  name = "${var.instance_name}-latest-ami-id"
+  type = "String"
+  # The value is populated from within the instance - once initialized
+  value = (length(var.custom_ami) > 0) ? var.custom_ami : data.aws_ami.windows_ami.image_id
+
+  tags = merge(var.additional_tags, {
+    Name = "${var.instance_name}-latest-ami-id"
+  })
+}
+
 resource "aws_security_group" "default" {
   name   = "${var.instance_name}-sg"
   vpc_id = var.vpc_id
@@ -118,6 +129,14 @@ data "aws_iam_policy" "full_s3_policy_for_game_store" {
   arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
+data "aws_iam_policy" "ec2_full_policy" {
+  arn = "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+}
+
+data "aws_iam_policy" "ssm_full_policy" {
+  arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
+}
+
 resource "aws_iam_role_policy_attachment" "password_get_parameter_policy_attachment" {
   role       = aws_iam_role.windows_instance_role.name
   policy_arn = aws_iam_policy.password_get_parameter_policy.arn
@@ -133,6 +152,16 @@ resource "aws_iam_role_policy_attachment" "full_s3_policy_for_game_store_attachm
   policy_arn = data.aws_iam_policy.full_s3_policy_for_game_store.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ec2_full_policy_attachment" {
+  role       = aws_iam_role.windows_instance_role.name
+  policy_arn = data.aws_iam_policy.ec2_full_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_full_policy_attachment" {
+  role       = aws_iam_role.windows_instance_role.name
+  policy_arn = data.aws_iam_policy.ssm_full_policy.arn
+}
+
 resource "aws_iam_instance_profile" "windows_instance_profile" {
   name = "${var.instance_name}-instance-profile"
   role = aws_iam_role.windows_instance_role.name
@@ -146,6 +175,8 @@ resource "random_shuffle" "subnet_id" {
   input        = data.aws_subnet_ids.subnet_ids.ids
   result_count = 1
 }
+
+data "aws_region" "current" {}
 
 resource "aws_spot_instance_request" "windows_instance" {
   instance_type   = var.instance_type
@@ -173,6 +204,14 @@ resource "aws_spot_instance_request" "windows_instance" {
   wait_for_fulfillment = true
   hibernation          = true
 
+  provisioner "local-exec" {
+    command = join("", formatlist("aws ec2 create-tags --resources ${self.spot_instance_id} --tags Key=\"%s\",Value=\"%s\" --region=${data.aws_region.current.name}; ", keys(self.tags), values(self.tags)))
+  }
+
+  provisioner "local-exec" {
+    command = "for eachVolume in `aws ec2 describe-volumes --region ${data.aws_region.current.name} --filters Name=attachment.instance-id,Values=${self.spot_instance_id} | jq -r .Volumes[].VolumeId`; do ${join("", formatlist("aws ec2 create-tags --resources $eachVolume --tags          Key=\"%s\",Value=\"%s\" --region=${data.aws_region.current.name}; ", keys(self.tags), values(self.tags)))} done;"
+  }
+
   # Get a random subnet to play with
   subnet_id = random_shuffle.subnet_id.result[0]
 
@@ -195,18 +234,18 @@ resource "aws_spot_instance_request" "windows_instance" {
 
 # Bucket for storing games
 resource "aws_s3_bucket" "games_bucket" {
-  bucket = "${var.instance_name}-gaming-bucket"
-  acl    = "private"
+  bucket        = "${var.instance_name}-bucket"
+  acl           = "private"
+  force_destroy = false
 
   lifecycle_rule {
     enabled = true
     transition {
       storage_class = "INTELLIGENT_TIERING"
     }
-
   }
 
   tags = merge(var.additional_tags, {
-    Name = "${var.instance_name}-gaming-bucket"
+    Name = "${var.instance_name}-bucket"
   })
 }

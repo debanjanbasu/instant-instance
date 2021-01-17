@@ -1,26 +1,7 @@
 <powershell>
 
-# get a list of the disks that can be pooled
-$PhysicalDisks = (Get-PhysicalDisk -CanPool $true)
-# only take action if there actually are disks
-if ($PhysicalDisks) {
-    # create storage pool using the discovered disks, called ephemeral in the standard subsystem
-    New-StoragePool –FriendlyName ephemeral -StorageSubSystemFriendlyName "Windows Storage*" –PhysicalDisks $PhysicalDisks
-    # Create a virtual disk, striped (simple resiliency in its terms), use all space
-    New-VirtualDisk -StoragePoolFriendlyName "ephemeral" -FriendlyName "stripedephemeral" -ResiliencySettingName Simple -UseMaximumSize
-    # initialise the disk
-    Get-VirtualDisk -FriendlyName 'stripedephemeral'|Initialize-Disk -PartitionStyle GPT -PassThru
-    # create a partition, use all available size (this will pop up if you do it interactively to format the drive, not a problem when running as userdata)
-    New-Partition -DiskNumber 1 -DriveLetter 'D' -UseMaximumSize
-    # format as NTFS to make it useable
-    Format-Volume -DriveLetter D -FileSystem NTFS -Confirm:$false
-    # this creates a folder on the drive to use as the workspace by the agent
-    New-Item -ItemType Directory -Force -Path D:\games
-}
-
 function run-once-on-login ($taskname, $action) {
-    $trigger = New-ScheduledTaskTrigger -AtLogon -RandomDelay $(New-TimeSpan -seconds 10)
-    $trigger.Delay = "PT10S"
+    $trigger = New-ScheduledTaskTrigger -AtLogon
     $selfDestruct = New-ScheduledTaskAction -Execute powershell.exe -Argument "-WindowStyle Hidden -Command `"Disable-ScheduledTask -TaskName $taskname`""
     Register-ScheduledTask -TaskName $taskname -Trigger $trigger -Action $action,$selfDestruct -RunLevel Highest
 }
