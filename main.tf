@@ -28,7 +28,6 @@ module "instant_instance_vpc" {
 
 data "aws_ssm_parameter" "backed_up_ami" {
   name       = "${local.instance_name}-latest-ami-id"
-  depends_on = [module.instant_instance.cloud_gaming_latest_ami_id]
 }
 
 module "instant_instance" {
