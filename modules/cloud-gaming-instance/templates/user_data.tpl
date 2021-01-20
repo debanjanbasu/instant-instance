@@ -127,7 +127,7 @@ function install-graphic-driver {
 
 install-chocolatey
 Install-PackageProvider -Name NuGet -Force
-choco install awstools.powershell
+choco install awstools.powershell awscli 7zip git
 
 %{ if var.install_parsec }
 install-parsec-cloud-preparation-tool
