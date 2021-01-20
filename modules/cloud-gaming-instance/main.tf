@@ -233,19 +233,24 @@ resource "aws_spot_instance_request" "windows_instance" {
 }
 
 # Bucket for storing games
-resource "aws_s3_bucket" "games_bucket" {
-  bucket        = "${var.instance_name}-bucket"
-  acl           = "private"
-  force_destroy = false
+# resource "aws_s3_bucket" "games_bucket" {
+#   bucket        = "${var.instance_name}-bucket"
+#   acl           = "private"
+#   force_destroy = false
 
-  lifecycle_rule {
-    enabled = true
-    transition {
-      storage_class = "INTELLIGENT_TIERING"
-    }
-  }
+#   lifecycle_rule {
+#     enabled = true
+#     transition {
+#       storage_class = "INTELLIGENT_TIERING"
+#     }
+#   }
 
-  tags = merge(var.additional_tags, {
-    Name = "${var.instance_name}-bucket"
-  })
-}
+#   # Don't destroy the bucket even on stack destruction
+#   lifecycle {
+#     prevent_destroy = true
+#   }
+
+#   tags = merge(var.additional_tags, {
+#     Name = "${var.instance_name}-bucket"
+#   })
+# }
