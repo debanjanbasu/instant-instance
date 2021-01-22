@@ -105,26 +105,6 @@ EOF
   })
 }
 
-resource "aws_iam_policy" "password_get_parameter_policy" {
-  name   = "${var.instance_name}-password-get-parameter-policy"
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "ssm:GetParameter",
-      "Resource": "${aws_ssm_parameter.password.arn}"
-    }
-  ]
-}
-EOF
-}
-
-data "aws_iam_policy" "driver_get_object_policy" {
-  arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-}
-
 data "aws_iam_policy" "full_s3_policy_for_game_store" {
   arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
@@ -135,16 +115,6 @@ data "aws_iam_policy" "ec2_full_policy" {
 
 data "aws_iam_policy" "ssm_full_policy" {
   arn = "arn:aws:iam::aws:policy/AmazonSSMFullAccess"
-}
-
-resource "aws_iam_role_policy_attachment" "password_get_parameter_policy_attachment" {
-  role       = aws_iam_role.windows_instance_role.name
-  policy_arn = aws_iam_policy.password_get_parameter_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "driver_get_object_policy_attachment" {
-  role       = aws_iam_role.windows_instance_role.name
-  policy_arn = data.aws_iam_policy.driver_get_object_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "full_s3_policy_for_game_store_attachment" {
