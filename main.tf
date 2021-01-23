@@ -10,7 +10,7 @@ module "terraform_state_backend" {
   source                        = "git::https://github.com/cloudposse/terraform-aws-tfstate-backend.git?ref=master"
   namespace                     = lookup(var.additional_tags, "Namespace", "instant-instance")
   stage                         = "build"
-  name                          = "terraform-state-bucket"
+  name                          = "terraform-state"
   attributes                    = ["state"]
   enable_server_side_encryption = true
   enable_public_access_block    = true
@@ -41,8 +41,15 @@ module "instant_instance" {
   # TODO - Automate in the future
   spot_max_price = 1.0
   # IMP - Please install the tools and all in the first time
-  skip_install = false
+  skip_install = true
   # This ami id would keep on changing
   # custom_ami   = data.aws_ssm_parameter.backed_up_ami.value
-  # custom_ami = ""
+  custom_ami = "ami-0f5c9e702a5739e96"
+}
+
+module "ssm_automation" {
+  source                 = "./modules/ssm-automation"
+  additional_tags        = var.additional_tags
+  ssm_ami_parameter_name = data.aws_ssm_parameter.backed_up_ami.name
+  depends_on             = [module.instant_instance]
 }
