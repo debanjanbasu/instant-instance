@@ -38,8 +38,24 @@ resource "aws_ssm_document" "create_new_image_delete_old" {
         "ImageName": "{{ InstanceId }}-{{global:DATE_TIME}}-{{automation:EXECUTION_ID}}",
         "ImageDescription": "${var.instance_name}-ami-{{global:DATE_TIME}}",
         "NoReboot": "{{ NoReboot }}"
-      },
-      "nextStep": "storeAMIId"
+      }
+    },
+    {
+      "name": "stopInstances",
+      "action": "aws:changeInstanceState",
+      "onFailure": "Abort",
+      "inputs": {
+        "InstanceIds": ["{{ InstanceId }}"],
+        "DesiredState": "terminated"
+      }
+    },
+    {
+      "name": "deleteImage",
+      "action": "aws:deleteImage",
+      "onFailure": "Abort",
+      "inputs": {
+        "ImageId": "{{ ToDeleteImageId }}"
+      }
     },
     {
       "name": "storeAMIId",
@@ -51,15 +67,6 @@ resource "aws_ssm_document" "create_new_image_delete_old" {
         "Name": "${var.ssm_ami_parameter_name}",
         "Overwrite": true,
         "Value": "{{ createImage.ImageId }}"
-      },
-      "nextStep": "deleteImage"
-    },
-    {
-      "name": "deleteImage",
-      "action": "aws:deleteImage",
-      "onFailure": "Abort",
-      "inputs": {
-        "ImageId": "{{ ToDeleteImageId }}"
       }
     }
   ],

@@ -1,21 +1,5 @@
 <powershell>
 
-# get a list of the disks that can be pooled
-$PhysicalDisks = (Get-PhysicalDisk -CanPool $true)
-# only take action if there actually are disks
-if ($PhysicalDisks) {
-    # create storage pool using the discovered disks, called ephemeral in the standard subsystem
-    New-StoragePool –FriendlyName ephemeral -StorageSubSystemFriendlyName "Windows Storage*" –PhysicalDisks $PhysicalDisks
-    # Create a virtual disk, striped (simple resiliency in its terms), use all space
-    New-VirtualDisk -StoragePoolFriendlyName "ephemeral" -FriendlyName "stripedephemeral" -ResiliencySettingName Simple -UseMaximumSize
-    # initialise the disk
-    Get-VirtualDisk -FriendlyName 'stripedephemeral'|Initialize-Disk -PartitionStyle GPT -PassThru
-    # create a partition, use all available size (this will pop up if you do it interactively to format the drive, not a problem when running as userdata)
-    New-Partition -DiskNumber 1 -DriveLetter 'Z' -UseMaximumSize
-    # format as NTFS to make it useable
-    Format-Volume -DriveLetter Z -FileSystem NTFS -Confirm:$false
-}
-
 function run-once-on-login ($taskname, $action) {
     $trigger = New-ScheduledTaskTrigger -AtLogon
     $selfDestruct = New-ScheduledTaskAction -Execute powershell.exe -Argument "-WindowStyle Hidden -Command `"Disable-ScheduledTask -TaskName $taskname`""
@@ -179,5 +163,7 @@ choco install origin
 %{ if var.install_epic_games_launcher }
 choco install epicgameslauncher
 %{ endif }
+
+choco install awscli
 
 </powershell>

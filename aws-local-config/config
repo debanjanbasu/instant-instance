@@ -1,0 +1,8 @@
+[default]
+region = ap-southeast-2
+output = json
+s3 = 
+    max_concurrent_requests = 1000
+    max_queue_size = 10000
+    multipart_threshold = 128MB
+    multipart_chunksize = 128MB

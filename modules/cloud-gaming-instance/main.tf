@@ -71,7 +71,6 @@ resource "aws_security_group_rule" "vnc_ingress" {
   security_group_id = aws_security_group.default.id
 }
 
-
 # Allow outbound connection to everywhere
 resource "aws_security_group_rule" "default" {
   type              = "egress"
@@ -172,7 +171,7 @@ resource "aws_spot_instance_request" "windows_instance" {
   # Spot configuration
   spot_type            = "one-time"
   wait_for_fulfillment = true
-  hibernation          = true
+  hibernation          = false # AWS still doesn't support it for GPU instances
 
   provisioner "local-exec" {
     command = join("", formatlist("aws ec2 create-tags --resources ${self.spot_instance_id} --tags Key=\"%s\",Value=\"%s\" --region=${data.aws_region.current.name}; ", keys(self.tags), values(self.tags)))

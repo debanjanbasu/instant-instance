@@ -27,8 +27,7 @@ module "instant_instance_vpc" {
 }
 
 data "aws_ssm_parameter" "backed_up_ami" {
-  name       = "${local.instance_name}-latest-ami-id"
-  depends_on = [module.instant_instance]
+  name = "${local.instance_name}-latest-ami-id"
 }
 
 module "instant_instance" {
@@ -42,9 +41,10 @@ module "instant_instance" {
   spot_max_price = 1.0
   # IMP - Please install the tools and all in the first time
   skip_install = true
-  # This ami id would keep on changing
-  # custom_ami   = data.aws_ssm_parameter.backed_up_ami.value
-  custom_ami = "ami-0f5c9e702a5739e96"
+  # For the first time, no custom_ami is needed, so just comment it out
+  # This ami id would keep on changing - only use this once instance is provisioned
+  custom_ami = data.aws_ssm_parameter.backed_up_ami.value
+  # custom_ami = "ami-0e0454a1d8f08c442"
 }
 
 module "ssm_automation" {
