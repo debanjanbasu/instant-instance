@@ -38,24 +38,27 @@ resource "aws_ssm_document" "create_new_image_delete_old" {
         "ImageName": "{{ InstanceId }}-{{global:DATE_TIME}}-{{automation:EXECUTION_ID}}",
         "ImageDescription": "${var.instance_name}-ami-{{global:DATE_TIME}}",
         "NoReboot": "{{ NoReboot }}"
-      }
+      },
+      "nextStep": "stopInstances"
     },
     {
       "name": "stopInstances",
       "action": "aws:changeInstanceState",
-      "onFailure": "Abort",
+      "onFailure": "step:deleteImage",
       "inputs": {
         "InstanceIds": ["{{ InstanceId }}"],
         "DesiredState": "terminated"
-      }
+      },
+      "nextStep": "deleteImage"
     },
     {
       "name": "deleteImage",
       "action": "aws:deleteImage",
-      "onFailure": "Abort",
+      "onFailure": "step:storeAMIId",
       "inputs": {
         "ImageId": "{{ ToDeleteImageId }}"
-      }
+      },
+      "nextStep": "storeAMIId"
     },
     {
       "name": "storeAMIId",
