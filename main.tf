@@ -40,10 +40,10 @@ module "instant_instance" {
   # TODO - Automate in the future
   spot_max_price = 1.0
   # IMP - Please install the tools and all in the first time
-  skip_install = true
+  skip_install = false
   # For the first time, no custom_ami is needed, so just comment it out
   # This ami id would keep on changing - only use this once instance is provisioned
-  custom_ami = data.aws_ssm_parameter.backed_up_ami.value
+  # custom_ami = data.aws_ssm_parameter.backed_up_ami.value
   # custom_ami = "ami-0e0454a1d8f08c442"
 }
 
