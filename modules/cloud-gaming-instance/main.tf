@@ -81,24 +81,20 @@ resource "aws_security_group_rule" "default" {
   security_group_id = aws_security_group.default.id
 }
 
-resource "aws_iam_role" "windows_instance_role" {
-  name               = "${var.instance_name}-instance-role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
+data "aws_iam_policy_document" "instance-assume-role-policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
     }
-  ]
+  }
 }
-EOF
 
+resource "aws_iam_role" "windows_instance_role" {
+  name                 = "${var.instance_name}-instance-role"
+  max_session_duration = 43200
+  assume_role_policy   = data.aws_iam_policy_document.instance-assume-role-policy.json
   tags = merge(var.additional_tags, {
     Name = "${var.instance_name}-instance-role"
   })
@@ -184,9 +180,9 @@ resource "aws_spot_instance_request" "windows_instance" {
   # Get a random subnet to play with
   subnet_id = random_shuffle.subnet_id.result[0]
 
-  lifecycle {
-    ignore_changes = [subnet_id]
-  }
+  # lifecycle {
+  #   ignore_changes = [subnet_id]
+  # }
 
   # EBS configuration
   ebs_optimized = true
