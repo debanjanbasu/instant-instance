@@ -23,7 +23,7 @@ module "terraform_state_backend" {
 module "instant_instance_vpc" {
   source          = "./modules/vpc"
   additional_tags = var.additional_tags
-  vpc_name        = "instant-instance"
+  vpc_name        = "cloud-gaming"
 }
 
 # # Use this only if you've already played, and taken an ami
