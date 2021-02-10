@@ -57,6 +57,7 @@ resource "aws_main_route_table_association" "main_rtb" {
 # VPC Endpoints for S3 Access
 data "aws_vpc_endpoint_service" "s3" {
   service = "s3"
+  service_type = "Gateway"
 }
 resource "aws_vpc_endpoint" "private_s3" {
   vpc_id       = aws_vpc.instant_instance_vpc.id

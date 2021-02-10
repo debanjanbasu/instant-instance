@@ -5,7 +5,7 @@ data "aws_ami" "windows_ami" {
   # Get the latest windows server 2019 ami
   filter {
     name   = "name"
-    values = ["EC2LaunchV2_Preview-Windows_Server-2019-English-Full-Base*"]
+    values = ["Windows_Server-2019-English-Full-Base*"]
   }
 }
 

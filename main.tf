@@ -10,7 +10,7 @@ module "terraform_state_backend" {
   source                        = "git::https://github.com/cloudposse/terraform-aws-tfstate-backend.git?ref=master"
   namespace                     = lookup(var.additional_tags, "Namespace", "instant-instance")
   stage                         = "build"
-  name                          = "terraform-state"
+  name                          = "terraform"
   attributes                    = ["state"]
   enable_server_side_encryption = true
   enable_public_access_block    = true
@@ -26,9 +26,10 @@ module "instant_instance_vpc" {
   vpc_name        = "instant-instance"
 }
 
-data "aws_ssm_parameter" "backed_up_ami" {
-  name = "${local.instance_name}-latest-ami-id"
-}
+# # Use this only if you've already played, and taken an ami
+# data "aws_ssm_parameter" "backed_up_ami" {
+#   name = "${local.instance_name}-latest-ami-id"
+# }
 
 module "instant_instance" {
   source          = "./modules/cloud-gaming-instance"
@@ -47,9 +48,10 @@ module "instant_instance" {
   # custom_ami = "ami-0e0454a1d8f08c442"
 }
 
-module "ssm_automation" {
-  source                 = "./modules/ssm-automation"
-  additional_tags        = var.additional_tags
-  ssm_ami_parameter_name = data.aws_ssm_parameter.backed_up_ami.name
-  depends_on             = [module.instant_instance]
-}
+# Use this for automated ami snapshot eventually
+# module "ssm_automation" {
+#   source                 = "./modules/ssm-automation"
+#   additional_tags        = var.additional_tags
+#   ssm_ami_parameter_name = data.aws_ssm_parameter.backed_up_ami.name
+#   depends_on             = [module.instant_instance]
+# }
